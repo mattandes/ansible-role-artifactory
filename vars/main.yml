@@ -1,0 +1,6 @@
+---
+artifactory_user_id: 1030
+artifactory_nginx_user_id: 104
+artifactory_nginx_group_id: 107
+artifactory_postgres_user_id: 999
+artifactory_postgres_group_id: 999

@@ -1,0 +1,28 @@
+---
+galaxy_info:
+  author: Matt Andes
+  description: Ansible Role to install Artifactory via Docker
+  role_name: artifactory
+  license: MIT
+  min_ansible_version: 2.7
+  platforms:
+    - name: EL
+      versions:
+        - 6
+        - 7
+    - name: Fedora
+      versions:
+        - all
+    - name: Debian
+      versions:
+        - jessie
+        - stretch
+    - name: Ubuntu
+      versions:
+        - trusty
+        - xenial
+        - bionic
+  galaxy_tags:
+    - artifactory
+
+dependencies: []

@@ -1,0 +1,6 @@
+---
+- name: Uninstall Artifactory
+  docker_service:
+    project_name: artifactory
+    project_src: "{{ artifactory_data_dir }}"
+    state: absent

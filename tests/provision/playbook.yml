@@ -1,0 +1,14 @@
+---
+- hosts:
+    - artifactory
+  become: true
+  roles:
+    - role: geerlingguy.docker
+      docker_install_compose: false
+    - role: geerlingguy.repo-epel
+    - role: geerlingguy.pip
+      pip_install_packages:
+        - name: docker
+        - name: docker-compose
+          version: "1.22.0"
+    - role: mattandes.artifactory

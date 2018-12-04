@@ -1,0 +1,27 @@
+---
+dependency:
+  name: galaxy
+driver:
+  name: delegated
+  options:
+    managed: false
+    ansible_connection_options:
+      connection: local
+lint:
+  name: yamllint
+  options:
+    config-file: molecule/travisci/yaml-lint.yml
+platforms:
+  - name: localhost
+provisioner:
+  name: ansible
+  lint:
+    name: ansible-lint
+  playbooks:
+    converge: ${MOLECULE_PLAYBOOK:-playbook.yml}
+scenario:
+  name: travisci
+verifier:
+  name: testinfra
+  lint:
+    name: flake8

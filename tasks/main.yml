@@ -1,0 +1,80 @@
+---
+- name: Ensure Base Data directory exists
+  file:
+    name: "{{ artifactory_data_dir }}"
+    state: directory
+    owner: 0
+    group: 0
+    mode: 0750
+
+- name: Ensure Artifactory Data directories exists
+  file:
+    name: "{{ item }}"
+    state: directory
+    owner: "{{ artifactory_user_id }}"
+    group: "{{ artifactory_user_id }}"
+    mode: 0770
+  with_items:
+    - "{{ artifactory_data_dir }}/artifactory"
+    - "{{ artifactory_data_dir }}/artifactory/etc"
+
+- name: Ensure PostgreSQL Data directory exists
+  file:
+    name: "{{ artifactory_data_dir }}/postgresql"
+    state: directory
+    owner: "{{ artifactory_postgres_user_id }}"
+    group: "{{ artifactory_postgres_group_id }}"
+    mode: 0700
+
+- name: Ensure NGINX Data directories exists
+  file:
+    name: "{{ item }}"
+    state: directory
+    owner: "{{ artifactory_nginx_user_id }}"
+    group: "{{ artifactory_nginx_group_id }}"
+    mode: 0770
+  with_items:
+    - "{{ artifactory_data_dir }}/nginx"
+    - "{{ artifactory_data_dir }}/nginx/conf.d"
+    - "{{ artifactory_data_dir }}/nginx/logs"
+    - "{{ artifactory_data_dir }}/nginx/ssl"
+
+- name: Create NGINX configuration files
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: "{{ artifactory_nginx_user_id }}"
+    group: "{{ artifactory_nginx_group_id }}"
+    mode: 0640
+  with_items:
+    - src: nginx_artifactory.conf.j2
+      dest: "{{ artifactory_data_dir }}/nginx/conf.d/artifactory.conf"
+
+- name: Create docker-compose.yml file
+  template:
+    dest: "{{ artifactory_data_dir }}/docker-compose.yml"
+    src: "{{ artifactory_docker_compose_template }}"
+    owner: 0
+    group: 0
+    mode: 0640
+  notify: Uninstall Artifactory
+
+- name: Flush handlers
+  meta: flush_handlers
+
+- name: Pre-Pull Docker images
+  docker_image:
+    name: "{{ item.name }}"
+    tag: "{{ item.tag }}"
+  with_items:
+    - name: "{{ artifactory_docker_registry }}/{{ artifactory_postgres_image }}"
+      tag: "{{ artifactory_postgres_image_tag }}"
+    - name: "{{ artifactory_docker_registry }}/{{ artifactory_image }}"
+      tag: "{{ artifactory_image_tag }}"
+    - name: "{{ artifactory_docker_registry }}/{{ artifactory_nginx_image }}"
+      tag: "{{ artifactory_nginx_image_tag }}"
+
+- name: Install Artifactory via Docker Compose
+  docker_service:
+    project_name: artifactory
+    project_src: "{{ artifactory_data_dir }}"

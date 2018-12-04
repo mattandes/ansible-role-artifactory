@@ -1,0 +1,13 @@
+---
+- box:
+    vb: "geerlingguy/centos7"
+  name: "artifactory"
+  nics:
+    - type: "private_network"
+      ip_addr: "192.168.99.30"
+  ports:
+    - guest_port: "80"
+    - guest_port: "443"
+    - guest_port: "8081"
+  ram: "4096"
+  vcpu: "2"

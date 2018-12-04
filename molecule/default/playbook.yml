@@ -1,0 +1,27 @@
+---
+- name: Converge
+  hosts: all
+  become: true
+  roles:
+    - role: geerlingguy.docker
+      docker_install_compose: false
+    - role: geerlingguy.repo-epel
+    - role: geerlingguy.pip
+      pip_install_packages:
+        - name: docker
+        - name: docker-compose
+          version: "1.22.0"
+    - role: mattandes.artifactory
+      molecule_testing: true
+
+  post_tasks:
+    - name: Check if Artifactory is running
+      uri:
+        url: "https://127.0.0.1/artifactory/webapp/"
+        status_code: 200
+        return_content: false
+        validate_certs: false
+      register: result
+      until: result.status == 200
+      retries: 60
+      delay: 1

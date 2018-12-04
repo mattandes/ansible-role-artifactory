@@ -1,0 +1,6 @@
+---
+- name: geerlingguy.docker
+
+- name: geerlingguy.repo-epel
+
+- name: geerlingguy.pip

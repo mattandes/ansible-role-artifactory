@@ -1,0 +1,66 @@
+---
+version: '2'
+services:
+  postgresql:
+    image: {{ artifactory_docker_registry }}/{{ artifactory_postgres_image }}:{{ artifactory_postgres_image_tag }}
+    container_name: postgresql
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_DB=artifactory
+      # The following must match the DB_USER and DB_PASSWORD values passed to Artifactory
+      - POSTGRES_USER={{ artifactory_postgres_db_user }}
+      - POSTGRES_PASSWORD={{ artifactory_postgres_db_password }}
+    volumes:
+      - {{ artifactory_data_dir }}/postgresql:/var/lib/postgresql/data
+    restart: always
+    ulimits:
+      nproc: 65535
+      nofile:
+        soft: 32000
+        hard: 40000
+  artifactory:
+    image: {{ artifactory_docker_registry }}/{{ artifactory_image }}:{{ artifactory_image_tag }}
+    container_name: artifactory
+    ports:
+      - 8081:8081
+    depends_on:
+      - postgresql
+    links:
+      - postgresql
+    volumes:
+      - {{ artifactory_data_dir }}/artifactory:/var/opt/jfrog/artifactory
+    environment:
+      - DB_TYPE=postgresql
+      # The following must match the POSTGRES_USER and POSTGRES_PASSWORD values passed to PostgreSQL
+      - DB_USER={{ artifactory_postgres_db_user }}
+      - DB_PASSWORD={{ artifactory_postgres_db_password }}
+      # Add extra Java options by uncommenting the following line
+      # - EXTRA_JAVA_OPTIONS=-Xmx4g
+    restart: always
+    ulimits:
+      nproc: 65535
+      nofile:
+        soft: 32000
+        hard: 40000
+  nginx:
+    image: {{ artifactory_docker_registry }}/{{ artifactory_nginx_image }}:{{ artifactory_nginx_image_tag }}
+    container_name: nginx
+    ports:
+      - 80:80
+      - 443:443
+    depends_on:
+      - artifactory
+    links:
+      - artifactory
+    volumes:
+      - {{ artifactory_data_dir }}/nginx:/var/opt/jfrog/nginx
+    environment:
+      - ART_BASE_URL=http://artifactory:8081/artifactory
+      - SSL=true
+    restart: always
+    ulimits:
+      nproc: 65535
+      nofile:
+        soft: 32000
+        hard: 40000

@@ -1,0 +1,19 @@
+---
+artifactory_data_dir: /data
+artifactory_docker_compose_template: docker-compose.yml.j2
+artifactory_docker_registry: docker.bintray.io
+
+# Postgres Options
+artifactory_postgres_image: postgres
+artifactory_postgres_image_tag: "9.5.2"
+artifactory_postgres_db_user: artifactory
+artifactory_postgres_db_password: artifactory
+
+# Artifactory Options
+artifactory_type: oss
+artifactory_image: "jfrog/artifactory-{{ artifactory_type | lower }}"
+artifactory_image_tag: "6.5.9"
+
+# NGINX Options
+artifactory_nginx_image: jfrog/nginx-artifactory-pro
+artifactory_nginx_image_tag: "6.5.9"

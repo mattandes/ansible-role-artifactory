@@ -1,0 +1,22 @@
+---
+- name: Converge
+  hosts: localhost
+  connection: local
+  become: true
+  environment:
+    PYTHONPATH: "{{ lookup('env','PYTHONPATH') }}:/home/travis/virtualenv/python2.7.15/lib/python2.7/site-packages"
+
+  roles:
+    - role: mattandes.artifactory
+
+  post_tasks:
+    - name: Check if Artifactory is running
+      uri:
+        url: "https://127.0.0.1/artifactory/webapp/"
+        status_code: 200
+        return_content: false
+        validate_certs: false
+      register: result
+      until: result.status == 200
+      retries: 60
+      delay: 1

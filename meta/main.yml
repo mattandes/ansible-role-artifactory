@@ -2,6 +2,7 @@
 galaxy_info:
   author: Matt Andes
   description: Ansible Role to install Artifactory via Docker
+  company: N/A
   role_name: artifactory
   license: MIT
   min_ansible_version: 2.7
